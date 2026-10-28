@@ -58,7 +58,6 @@ def main():
                     payload = buf[6:4+length]
                     buf = buf[4+length:]
                     if control == 0 and command == 2 and not selected:
-                        print('Device item:', repr(payload), flush=True)
                         value, _, label = payload.partition(b'\0')
                         if args.name.encode() in label:
                             print('Discovered target:', label.decode(errors='replace'), flush=True)
