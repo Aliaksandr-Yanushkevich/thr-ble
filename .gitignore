@@ -1,0 +1,11 @@
+captures/
+.venv/
+__pycache__/
+.DS_Store
+.tools/
+private/
+*.pcap
+*.pcapng
+*.pklg
+*.key
+*.pem
