@@ -1,7 +1,8 @@
 import Foundation
 import CoreBluetooth
 
-// One experimental slot-selection write. No bulk initialization, patch dump,
+// One slot-selection write, optionally preceded by response-gated activation.
+// No patch dump,
 // save command, firmware update, or fixed GATT handle is used.
 let args = CommandLine.arguments
 guard (args.count == 3 || args.count == 5), args[1] == "--slot", let slot = Int(args[2]), (1...5).contains(slot),
@@ -100,7 +101,7 @@ final class Probe: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
         guard error == nil, c.isNotifying else {
             stop("Notification subscription failed: \(String(describing: error))", code: 1); return
         }
-        log("Subscribed; waiting 1 second before single write")
+        log("Subscribed; waiting 1 second before initialization or single write")
         initializing = !steps.isEmpty
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             if self.steps.isEmpty { self.sendIfReady(p) }
