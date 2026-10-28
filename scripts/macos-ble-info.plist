@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+<key>CFBundleIdentifier</key><string>local.thr-ble.slot-probe</string>
+<key>CFBundleName</key><string>THR BLE Slot Probe</string>
+<key>NSBluetoothAlwaysUsageDescription</key><string>Connect to your Yamaha THR amplifier to test one captured preset-selection command.</string>
+</dict></plist>
