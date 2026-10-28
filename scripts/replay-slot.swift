@@ -1,15 +1,19 @@
 import Foundation
 import CoreBluetooth
 
-// One slot-selection write, optionally preceded by response-gated activation.
+// Slot-selection writes eight seconds apart, with optional response-gated activation.
 // No patch dump,
 // save command, firmware update, or fixed GATT handle is used.
 let args = CommandLine.arguments
-guard (args.count == 3 || args.count == 5), args[1] == "--slot", let slot = Int(args[2]), (1...5).contains(slot),
+guard (args.count == 3 || args.count == 5), ["--slot", "--slots"].contains(args[1]),
       args.count == 3 || args[3] == "--init-profile" else {
-    print("Usage: replay-slot --slot 1..5 [--init-profile private/profile.json] (pedal OFF)")
+    print("Usage: replay-slot --slot 1..5 | --slots 1,2,3,4,5 [--init-profile private/profile.json] (pedal OFF)")
     exit(args.contains("--help") ? 0 : 2)
 }
+let slotParts = args[2].split(separator: ",", omittingEmptySubsequences: false)
+let slots = slotParts.compactMap { Int($0) }
+guard !slots.isEmpty, slots.count == slotParts.count, slots.allSatisfy({ (1...5).contains($0) }),
+      (args[1] == "--slots" || slots.count == 1) else { exit(2) }
 let midiService = CBUUID(string: "03B80E5A-EDE8-4B33-A751-6CE34EC4C700")
 let midiCharacteristic = CBUUID(string: "7772E5DB-3868-4112-A1A9-F2669D106BF3")
 struct InitStep: Decodable { let tx: String; let rx: String; let mask: [Int] }
@@ -26,8 +30,8 @@ func unhex(_ hex: String) -> [UInt8] {
 let initSteps: [InitStep] = args.count == 5 ? try JSONDecoder().decode([InitStep].self, from: Data(contentsOf: URL(fileURLWithPath: args[4]))) : []
 
 final class Probe: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
-    let slot: Int
-    init(slot: Int) { self.slot = slot; super.init() }
+    var slotIndex = 0
+    var slot: Int { slots[slotIndex] }
     var manager: CBCentralManager!
     var target: CBPeripheral?
     var characteristic: CBCharacteristic?
@@ -42,7 +46,7 @@ final class Probe: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
     func log(_ text: String) { print("\(ISO8601DateFormatter().string(from: Date())) \(text)"); fflush(stdout) }
     func start() {
         manager = CBCentralManager(delegate: self, queue: .main)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 45) { self.stop("Timeout", code: 1) }
+        DispatchQueue.main.asyncAfter(deadline: .now() + Double(45 + slots.count * 8)) { self.stop("Timeout", code: 1) }
     }
     func stop(_ reason: String, code: Int32) {
         guard !finishing else { return }
@@ -138,7 +142,13 @@ final class Probe: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
         log("TX slot=\(slot) UUID=\(c.uuid) bytes=\(bytes.map { String(format: "%02x", $0) }.joined())")
         p.writeValue(Data(bytes), for: c, type: .withoutResponse)
         DispatchQueue.main.asyncAfter(deadline: .now() + 8) {
-            self.stop("Write queued once; verify visible slot. ATT Write Command has no delivery acknowledgment.", code: 0)
+            if self.slotIndex + 1 < slots.count {
+                self.slotIndex += 1
+                self.sent = false
+                self.sendIfReady(p)
+            } else {
+                self.stop("Sequence queued; verify visible slots. ATT Write Command has no delivery acknowledgment.", code: 0)
+            }
         }
     }
     func peripheral(_ p: CBPeripheral, didUpdateValueFor c: CBCharacteristic, error: Error?) {
@@ -167,7 +177,7 @@ final class Probe: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
         }
     }
 }
-let probe = Probe(slot: slot)
+let probe = Probe()
 probe.steps = initSteps
 probe.start()
 RunLoop.main.run()
