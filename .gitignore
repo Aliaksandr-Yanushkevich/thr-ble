@@ -9,3 +9,5 @@ private/
 *.pklg
 *.key
 *.pem
+
+.pio/
