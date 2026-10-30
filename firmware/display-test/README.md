@@ -1,5 +1,7 @@
 # OLED smoke test, corrected implementation
 
+Repository navigation and device-specific workflows: [start here](../../docs/START-HERE.md). Uploading this test replaces the THR controller on the ESP32; upload `firmware/thr-controller` again to restore it.
+
 Hardware hypothesis: ESP32-C3 SuperMini OLED 0.42 inch, SSD1306 72×40.
 SDA=GPIO5, SCL=GPIO6, address 0x3C (ACK confirmed), RAM column offset 28.
 Direct Wire driver; U8g2 is not used at runtime.
@@ -16,5 +18,5 @@ RTC_NOINIT diagnostics: locate the oledDiagnostic symbol with nm from the curren
 Five uint32 values: magic 0x54485232, stage (1 setup, 2 I2C, 3 before init, 4 init ACK, 5 transmission error), uptime_ms, OLED address, loop count.
 Read using esptool.read_reg after resetting into ROM without loading a stub; RTC survives this reset but not power removal.
 The initial test hung inside U8g2 display.begin (stage=3, address=0x3C, loops=0). The internal library cause remains unresolved.
-After replacement: stage=4, uptime=30881 ms, loops=219, address=0x3C; visual confirmation was pending at this checkpoint.
+After replacement: stage=4, uptime=30881 ms, loops=219, address=0x3C. The user subsequently confirmed the display and blinking work; see [the experiment history](../../notes/esp32.md).
 The original flash image is saved in Git-ignored private/board-backups.

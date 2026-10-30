@@ -1,5 +1,7 @@
 # THR-II BLE control, explained
 
+**Start here:** [repository map and device workflows](docs/START-HERE.md) — what to flash onto the sniffer and ESP32, what to run on the Mac, where build outputs go, and which local files are required.
+
 An investigation of how **Yamaha THR Remote on iPhone** and a **standard AIRSTEP pedal** control a Yamaha THR10II amplifier over Bluetooth Low Energy. A separate nRF52840 radio passively captured the exchanges; Wireshark and small scripts exposed the BLE-MIDI messages inside them.
 
 The practical result: both controllers use the same stored-preset selection command for slots **1–5**, after accounting for BLE-MIDI timestamps and an observed message counter. A Swift/CoreBluetooth client subsequently selected all five slots from a Mac after the required initialization.

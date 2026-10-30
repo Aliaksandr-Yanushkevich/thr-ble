@@ -1,5 +1,7 @@
 # THR-II ESP32-C3 OLED button controller
 
+Repository navigation and device-specific workflows: [start here](../../docs/START-HERE.md).
+
 Board: user-verified SuperMini-style ESP32-C3 with a 0.42-inch SSD1306 72×40 display. Direct display driver on GPIO5 SDA / GPIO6 SCL, address 0x3C, RAM offset 28. Standard blue GPIO8 LED, active-low. Flash DIO 40 MHz.
 
 ## Button wiring
@@ -48,4 +50,4 @@ Errors: 1 connection, 2 encryption, 3 characteristic/properties, 4 read, 5 subsc
 
 ## Validation
 
-Build succeeded: flash 547824 bytes, static RAM 24332 bytes. esptool verified written-region hashes. The command matches the verified Mac template byte-for-byte. Initial RTC diagnostics: SCAN, uptime10814ms, loops1333, button_high1, tx0, rx0, error0. Physical button input and amplifier BLE switching still require verification.
+Build succeeded: flash 547824 bytes, static RAM 24332 bytes. esptool verified written-region hashes. The command matches the verified Mac template byte-for-byte. Initial RTC diagnostics showed SCAN. After disabling Mac Bluetooth to release its amplifier connection, later RTC diagnostics confirmed READY: init_step3, tx3, rx4, error0, MTU96, slot0, clicks0, button_high1. All three initialization stages received matching responses. Physical button input and actual amplifier slot switching from ESP still require verification. See [the experiment history](../../notes/esp32.md).
