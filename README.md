@@ -8,10 +8,7 @@ This repository also contains an ESP32-C3 OLED button controller built from that
 
 ## Photos and videos
 
-**Public iCloud album:** link coming soon.
-
-<!-- Replace the line above with: [Photos and videos on iCloud](PUBLIC_ICLOUD_ALBUM_URL) -->
-<!-- Suggested content: hardware and wiring photos, the capture setup, and preset-switching demonstrations. -->
+[Photos and videos on iCloud](https://www.icloud.com/sharedalbum/#D1gv33qrpzfwJK_ixino80GCHXgCAEQARogMqE5r0nIYdVyxgs--WrxOad_LXaJh-A9I78Gj7i_raI)
 
 ## How the setup works
 
